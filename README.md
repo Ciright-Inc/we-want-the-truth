@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# We Want The Truth
 
-## Getting Started
+Deploy-ready Next.js 14 multi-tenant app (frontend + tenant admin + super admin) with Prisma and PostgreSQL.
 
-First, run the development server:
+## Stack
+
+- Next.js 14 (App Router), TypeScript, Tailwind
+- Prisma ORM + PostgreSQL
+- NextAuth credential authentication
+- Optional Stripe billing + AWS S3 uploads
+
+## Run locally (fast path)
 
 ```bash
+npm install
+cp .env.example .env
+docker compose up -d db
+npm run db:push
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+App URLs:
+- Main frontend: `http://localhost:3000`
+- Tenant public: `http://localhost:3000/t/beanvspenn`
+- Tenant admin: `http://localhost:3000/t/beanvspenn/admin`
+- Super admin: `http://localhost:3000/super-admin`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env` and set real values for production.
 
-## Learn More
+Required:
+- `DATABASE_URL`
+- `NEXTAUTH_URL`
+- `NEXTAUTH_SECRET`
+- `NEXT_PUBLIC_APP_URL`
 
-To learn more about Next.js, take a look at the following resources:
+Domain-routing:
+- `MARKETING_HOSTS`
+- `SUPER_ADMIN_HOSTS`
+- `TENANT_HOST_MAP` (JSON map: host -> tenant slug)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Optional:
+- Stripe: `STRIPE_*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- S3 uploads: `AWS_*`, `S3_BUCKET`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Database
 
-## Deploy on Vercel
+Local PostgreSQL comes from `docker-compose.yml`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+docker compose up -d db
+npm run db:push
+npm run db:seed
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Useful Prisma commands:
+- `npm run db:push`
+- `npm run db:migrate`
+- `npm run db:seed`
+- `npm run db:studio`
+
+## Docker
+
+This project has one app container that serves all three surfaces:
+- Frontend
+- Tenant admin
+- Super admin
+
+Build image:
+
+```bash
+docker build -t we-want-the-truth .
+```
+
+Run with compose (app + db):
+
+```bash
+docker compose up -d --build
+```
+
+Run only production app compose:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+## Railway deploy
+
+`railway.json` is included with healthcheck path `/api/health`.
+
+Steps:
+1. Push project to GitHub.
+2. Create Railway project and connect repository.
+3. Add PostgreSQL service (or external Postgres) and configure `DATABASE_URL`.
+4. Add env values from `.env.example`.
+5. Set `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` to your Railway app URL.
+6. Deploy.
+7. Run one-time seed if needed: `npm run db:seed`.
+
+## Health check
+
+- `GET /api/health` returns app and database status.
+
+## Seed credentials (change immediately in production)
+
+- Super admin: `superadmin@we-want-the-truth.com` / `DevPassword!ChangeMe`
+- Tenant admin: `admin@beanvspenn.com` / `DevPassword!ChangeMe`
+- Tenant admin: `admin@cirightvscentili.com` / `DevPassword!ChangeMe`

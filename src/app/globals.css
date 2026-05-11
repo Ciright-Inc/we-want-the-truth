@@ -4,24 +4,50 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0c0a09;
+  --muted: #78716c;
+  --border: #e7e5e4;
+  --card: #ffffff;
+  --brand: #b91c1c;
+  --brand-foreground: #ffffff;
+  --brand-muted: #fef2f2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark,
+html.dark body {
+  --background: #0c0a09;
+  --foreground: #fafaf9;
+  --muted: #a8a29e;
+  --border: #292524;
+  --card: #1c1917;
+  --brand: #ef4444;
+  --brand-foreground: #ffffff;
+  --brand-muted: #292524;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .hero-surface {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(185, 28, 28, 0.07), transparent 55%),
+      radial-gradient(ellipse 80% 50% at 100% 0%, rgba(120, 113, 108, 0.06), transparent 45%),
+      radial-gradient(ellipse 60% 40% at 0% 30%, rgba(231, 229, 228, 0.9), transparent 50%);
+  }
+
+  html.dark .hero-surface {
+    background-image:
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(239, 68, 68, 0.12), transparent 55%),
+      radial-gradient(ellipse 80% 50% at 100% 0%, rgba(68, 64, 60, 0.35), transparent 45%),
+      radial-gradient(ellipse 60% 40% at 0% 30%, rgba(41, 37, 36, 0.9), transparent 50%);
   }
 }
