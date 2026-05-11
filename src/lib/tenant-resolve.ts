@@ -14,12 +14,11 @@ export function resolveTenantFromHost(host: string): { slug: string; isAdmin: bo
   const h = host.split(":")[0]?.toLowerCase() ?? "";
   const map = parseTenantHostMap();
 
-  const superMarketing = "admin.we-want-the-truth.com";
-  if (h === superMarketing || h.startsWith(`${superMarketing}:`)) {
+  if (isSuperAdminHost(h)) {
     return null;
   }
 
-  if (h.startsWith("admin.") && h !== superMarketing) {
+  if (h.startsWith("admin.")) {
     const apex = h.slice("admin.".length);
     const slug = map[apex];
     if (slug) return { slug, isAdmin: true };

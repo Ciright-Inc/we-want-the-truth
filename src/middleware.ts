@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { resolveTenantFromHost } from "@/lib/tenant-resolve";
+import { isSuperAdminHost, resolveTenantFromHost } from "@/lib/tenant-resolve";
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") || "";
-  const h = host.split(":")[0]?.toLowerCase() ?? "";
   const url = request.nextUrl.clone();
   const path = url.pathname;
 
@@ -13,8 +12,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Convenience alias: /admin -> /super-admin (and nested paths)
+  if (path === "/admin" || path.startsWith("/admin/")) {
+    const suffix = path.slice("/admin".length);
+    url.pathname = `/super-admin${suffix}`;
+    return NextResponse.rewrite(url);
+  }
+
   // Production super-admin hostname → internal /super-admin routes
-  if (h === "admin.we-want-the-truth.com") {
+  if (isSuperAdminHost(host)) {
     if (!path.startsWith("/super-admin")) {
       url.pathname = path === "/" ? "/super-admin" : `/super-admin${path}`;
       return NextResponse.rewrite(url);
