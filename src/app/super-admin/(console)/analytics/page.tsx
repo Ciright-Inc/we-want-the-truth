@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { LucideIcon } from "lucide-react";
 import { BarChart3, Building2, PlayCircle, Sparkles, Users, Vote, Waypoints } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -48,6 +49,14 @@ export default async function SuperAdminAnalyticsPage() {
   });
   const maxMonthlyViews = Math.max(...monthlyViews.map((m) => m.count), 1);
 
+  const statCards: Array<{ label: string; value: number; Icon: LucideIcon }> = [
+    { label: "Tenants", value: tenants, Icon: Building2 },
+    { label: "Users", value: users, Icon: Users },
+    { label: "Page views", value: pageViews, Icon: Waypoints },
+    { label: "Video plays", value: videoPlays, Icon: PlayCircle },
+    { label: "Jury votes", value: votes, Icon: Vote },
+  ];
+
   return (
     <div className="h-full w-full">
       <div className="flex min-h-[calc(100vh-3rem)] flex-col rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-7">
@@ -66,21 +75,15 @@ export default async function SuperAdminAnalyticsPage() {
         </div>
 
         <div className="mt-5 grid gap-3 sm:mt-6 sm:gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {[
-            ["Tenants", tenants, Building2],
-            ["Users", users, Users],
-            ["Page views", pageViews, Waypoints],
-            ["Video plays", videoPlays, PlayCircle],
-            ["Jury votes", votes, Vote],
-          ].map(([label, n, Icon]) => (
-            <article key={String(label)} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+          {statCards.map(({ label, value, Icon }) => (
+            <article key={label} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">{label}</p>
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-red-50 text-red-600">
                   <Icon className="h-4 w-4" aria-hidden />
                 </span>
               </div>
-              <p className="mt-2 text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">{n as number}</p>
+              <p className="mt-2 text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">{value}</p>
             </article>
           ))}
         </div>

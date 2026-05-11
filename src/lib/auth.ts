@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
@@ -79,7 +80,7 @@ async function authorizeTenantAdminViaCiright(credentials: Record<string, string
     const employee = payload.data?.[0]?.employees?.[0];
     if (!employee) return null;
 
-    const role = asBoolean(employee.isManagementEmployee) ? "TENANT_ADMIN" : "TENANT_EDITOR";
+    const role: UserRole = asBoolean(employee.isManagementEmployee) ? "TENANT_ADMIN" : "TENANT_EDITOR";
     const employeeId = employee.employeeId != null ? String(employee.employeeId) : `tenant-${tenantSlug}-${username}`;
 
     return {

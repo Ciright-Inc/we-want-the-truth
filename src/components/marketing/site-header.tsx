@@ -42,8 +42,8 @@ export function SiteHeader() {
           <Button
             type="button"
             variant="outline"
-            size="icon"
-            className="h-9 w-9 border-border/90 md:hidden"
+            size="sm"
+            className="h-9 w-9 shrink-0 border-border/90 px-0 md:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
           >
