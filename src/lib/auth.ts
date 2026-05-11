@@ -1,7 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { UserRole } from "@prisma/client";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 type CirightEmployee = {
@@ -163,30 +162,8 @@ export const authOptions: NextAuthOptions = {
           return authorizeTenantAdminViaCiright(credentials as Record<string, string>, requestedSlug);
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
-          include: { tenant: true },
-        });
-        if (!user?.passwordHash || user.disabled) {
-          return authorizeSuperAdminViaCiright(credentials as Record<string, string>);
-        }
-        const ok = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!ok) {
-          return authorizeSuperAdminViaCiright(credentials as Record<string, string>);
-        }
-        if (requestedSlug && user.tenant?.slug && user.tenant.slug !== requestedSlug) {
-          if (user.role !== "SUPER_ADMIN") return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name ?? undefined,
-          image: user.image ?? undefined,
-          role: user.role,
-          tenantId: user.tenantId,
-          tenantSlug: user.tenant?.slug ?? null,
-        };
+        // Super-admin login is authenticated strictly against Ciright (no local DB fallback).
+        return authorizeSuperAdminViaCiright(credentials as Record<string, string>);
       },
     }),
   ],
