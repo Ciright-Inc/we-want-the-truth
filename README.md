@@ -21,10 +21,10 @@ npm run dev
 ```
 
 App URLs:
-- Main frontend: `http://localhost:3000`
-- Tenant public: `http://localhost:3000/t/beanvspenn`
-- Tenant admin: `http://localhost:3000/t/beanvspenn/admin`
-- Super admin: `http://localhost:3000/super-admin`
+- Main frontend: `http://localhost:3001`
+- Tenant public: `http://localhost:3001/t/beanvspenn`
+- Tenant admin: `http://localhost:3001/t/beanvspenn/admin`
+- Super admin: `http://localhost:3001/super-admin`
 
 ## Environment variables
 

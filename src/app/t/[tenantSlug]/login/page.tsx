@@ -7,6 +7,7 @@ import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { normalizeEmail, validateLoginInput } from "@/lib/validators/client-auth";
 
 function LoginForm({ tenantSlug }: { tenantSlug: string }) {
   const sp = useSearchParams();
@@ -18,10 +19,15 @@ function LoginForm({ tenantSlug }: { tenantSlug: string }) {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const validationError = validateLoginInput({ email, password });
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setLoading(true);
     setError(null);
     const res = await signIn("credentials", {
-      email,
+      email: normalizeEmail(email),
       password,
       tenantSlug,
       redirect: false,

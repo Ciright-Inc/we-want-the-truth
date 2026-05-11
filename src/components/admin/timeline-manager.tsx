@@ -36,6 +36,7 @@ export function TimelineManager({ tenantSlug, items }: { tenantSlug: string; ite
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const form = useForm<FormValues>({
@@ -106,13 +107,14 @@ export function TimelineManager({ tenantSlug, items }: { tenantSlug: string; ite
   );
 
   function onSubmit(values: FormValues) {
+    setFormError(null);
     start(async () => {
       const res = await saveTimelineAction(tenantSlug, values);
       if (res.ok) {
         setOpen(false);
         window.location.reload();
       } else {
-        alert(res.error);
+        setFormError(res.error);
       }
     });
   }
@@ -175,10 +177,12 @@ export function TimelineManager({ tenantSlug, items }: { tenantSlug: string; ite
                 <div>
                   <Label>Event date / time</Label>
                   <Input type="datetime-local" className="mt-1" {...form.register("eventDate")} />
+                  {form.formState.errors.eventDate ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.eventDate.message}</p> : null}
                 </div>
                 <div>
                   <Label>Title</Label>
                   <Input className="mt-1" {...form.register("title")} />
+                  {form.formState.errors.title ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.title.message}</p> : null}
                 </div>
                 <div>
                   <Label>Short summary</Label>
@@ -187,22 +191,27 @@ export function TimelineManager({ tenantSlug, items }: { tenantSlug: string; ite
                 <div>
                   <Label>Full description (paragraphs)</Label>
                   <Textarea rows={8} className="mt-1 font-mono text-sm" {...form.register("fullDescription")} />
+                  {form.formState.errors.fullDescription ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.fullDescription.message}</p> : null}
                 </div>
                 <div>
                   <Label>Category</Label>
                   <Input className="mt-1" {...form.register("category")} />
+                  {form.formState.errors.category ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.category.message}</p> : null}
                 </div>
                 <div>
                   <Label>Video URL</Label>
                   <Input className="mt-1" {...form.register("videoUrl")} />
+                  {form.formState.errors.videoUrl ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.videoUrl.message}</p> : null}
                 </div>
                 <div>
                   <Label>Audio file URL</Label>
                   <Input className="mt-1" {...form.register("audioFileUrl")} />
+                  {form.formState.errors.audioFileUrl ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.audioFileUrl.message}</p> : null}
                 </div>
                 <div>
                   <Label>Image URLs (one per line)</Label>
                   <Textarea rows={3} className="mt-1" {...form.register("imageUrlsText")} />
+                  {form.formState.errors.imageUrlsText ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.imageUrlsText.message}</p> : null}
                 </div>
                 <div>
                   <Label>Visibility</Label>
@@ -221,6 +230,7 @@ export function TimelineManager({ tenantSlug, items }: { tenantSlug: string; ite
                   />
                   Featured
                 </label>
+                {formError ? <p className="text-sm text-red-700">{formError}</p> : null}
                 <Button type="submit" disabled={pending}>
                   Save
                 </Button>

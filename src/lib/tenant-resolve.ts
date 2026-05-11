@@ -44,7 +44,7 @@ export function isMarketingHost(host: string): boolean {
 
 export function isSuperAdminHost(host: string): boolean {
   const h = host.split(":")[0]?.toLowerCase() ?? "";
-  const list = (process.env.SUPER_ADMIN_HOSTS || "admin.we-want-the-truth.com,localhost")
+  const list = (process.env.SUPER_ADMIN_HOSTS || "admin.we-want-the-truth.com")
     .split(",")
     .map((s) => s.trim().toLowerCase());
   return list.includes(h);

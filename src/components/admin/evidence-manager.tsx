@@ -33,6 +33,7 @@ type FormValues = z.infer<typeof evidenceInputSchema>;
 export function EvidenceManager({ tenantSlug, rows }: { tenantSlug: string; rows: Row[] }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const form = useForm<FormValues>({
@@ -88,12 +89,13 @@ export function EvidenceManager({ tenantSlug, rows }: { tenantSlug: string; rows
   );
 
   function onSubmit(values: FormValues) {
+    setFormError(null);
     start(async () => {
       const res = await saveEvidenceAction(tenantSlug, values);
       if (res.ok) {
         setOpen(false);
         window.location.reload();
-      } else alert(res.error);
+      } else setFormError(res.error);
     });
   }
 
@@ -143,10 +145,12 @@ export function EvidenceManager({ tenantSlug, rows }: { tenantSlug: string; rows
                 <div>
                   <Label>Title</Label>
                   <Input className="mt-1" {...form.register("title")} />
+                  {form.formState.errors.title ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.title.message}</p> : null}
                 </div>
                 <div>
                   <Label>Exhibit label</Label>
                   <Input className="mt-1" {...form.register("exhibitLabel")} />
+                  {form.formState.errors.exhibitLabel ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.exhibitLabel.message}</p> : null}
                 </div>
                 <div>
                   <Label>Evidence date</Label>
@@ -155,22 +159,27 @@ export function EvidenceManager({ tenantSlug, rows }: { tenantSlug: string; rows
                 <div>
                   <Label>Evidence type</Label>
                   <Input className="mt-1" {...form.register("evidenceType")} />
+                  {form.formState.errors.evidenceType ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.evidenceType.message}</p> : null}
                 </div>
                 <div>
                   <Label>Description</Label>
                   <Textarea rows={3} className="mt-1" {...form.register("description")} />
+                  {form.formState.errors.description ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.description.message}</p> : null}
                 </div>
                 <div>
                   <Label>Evidence text</Label>
                   <Textarea rows={5} className="mt-1" {...form.register("evidenceText")} />
+                  {form.formState.errors.evidenceText ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.evidenceText.message}</p> : null}
                 </div>
                 <div>
                   <Label>Chain of custody</Label>
                   <Textarea rows={2} className="mt-1" {...form.register("chainOfCustodyNotes")} />
+                  {form.formState.errors.chainOfCustodyNotes ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.chainOfCustodyNotes.message}</p> : null}
                 </div>
                 <div>
                   <Label>Tags</Label>
                   <Input className="mt-1" {...form.register("tags")} />
+                  {form.formState.errors.tags ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.tags.message}</p> : null}
                 </div>
                 <div>
                   <Label>Visibility</Label>
@@ -179,6 +188,7 @@ export function EvidenceManager({ tenantSlug, rows }: { tenantSlug: string; rows
                     <option value="PRIVATE">PRIVATE</option>
                   </select>
                 </div>
+                {formError ? <p className="text-sm text-red-700">{formError}</p> : null}
                 <Button type="submit" disabled={pending}>
                   Save
                 </Button>

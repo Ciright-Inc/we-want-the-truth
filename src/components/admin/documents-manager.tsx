@@ -33,6 +33,7 @@ export function DocumentsManager({ tenantSlug, documents }: { tenantSlug: string
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<DocRow | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const form = useForm<FormValues>({
@@ -97,9 +98,14 @@ export function DocumentsManager({ tenantSlug, documents }: { tenantSlug: string
 
   function onSubmit(values: FormValues) {
     setMsg(null);
+    setFormError(null);
     start(async () => {
       const res = await saveDocumentAction(tenantSlug, values);
-      setMsg(res.ok ? res.message ?? "Saved" : res.error);
+      if (!res.ok) {
+        setFormError(res.error);
+        return;
+      }
+      setMsg(res.message ?? "Saved");
       if (res.ok) {
         setOpen(false);
         window.location.reload();
@@ -154,6 +160,7 @@ export function DocumentsManager({ tenantSlug, documents }: { tenantSlug: string
                 <div>
                   <Label>Title</Label>
                   <Input className="mt-1" {...form.register("title")} />
+                  {form.formState.errors.title ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.title.message}</p> : null}
                 </div>
                 <div>
                   <Label>Document date</Label>
@@ -162,18 +169,22 @@ export function DocumentsManager({ tenantSlug, documents }: { tenantSlug: string
                 <div>
                   <Label>Filing type</Label>
                   <Input className="mt-1" {...form.register("filingType")} />
+                  {form.formState.errors.filingType ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.filingType.message}</p> : null}
                 </div>
                 <div>
                   <Label>Source</Label>
                   <Input className="mt-1" {...form.register("source")} />
+                  {form.formState.errors.source ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.source.message}</p> : null}
                 </div>
                 <div>
                   <Label>Description</Label>
                   <Textarea rows={4} className="mt-1" {...form.register("description")} />
+                  {form.formState.errors.description ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.description.message}</p> : null}
                 </div>
                 <div>
                   <Label>Tags (comma-separated)</Label>
                   <Input className="mt-1" {...form.register("tags")} />
+                  {form.formState.errors.tags ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.tags.message}</p> : null}
                 </div>
                 <div>
                   <Label>Visibility</Label>
@@ -185,7 +196,9 @@ export function DocumentsManager({ tenantSlug, documents }: { tenantSlug: string
                 <div>
                   <Label>File asset ID (after S3 upload)</Label>
                   <Input className="mt-1 font-mono text-xs" placeholder="cuid…" {...form.register("fileAssetId")} />
+                  {form.formState.errors.fileAssetId ? <p className="mt-1 text-xs text-red-700">{form.formState.errors.fileAssetId.message}</p> : null}
                 </div>
+                {formError ? <p className="text-sm text-red-700">{formError}</p> : null}
                 <Button type="submit" disabled={pending}>
                   {pending ? "Saving…" : "Save"}
                 </Button>

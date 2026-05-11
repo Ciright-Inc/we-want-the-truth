@@ -51,15 +51,18 @@ export function CaseSettingsForm({
         <div>
           <Label htmlFor="caseSummary">Case summary (paragraphs: blank line between paragraphs)</Label>
           <Textarea id="caseSummary" rows={10} className="mt-1 font-mono text-sm" {...form.register("caseSummary")} />
+          {form.formState.errors.caseSummary && <p className="mt-1 text-xs text-red-700">{form.formState.errors.caseSummary.message}</p>}
         </div>
         <div>
           <Label htmlFor="heroStatement">Hero / warning statement</Label>
           <Textarea id="heroStatement" rows={3} className="mt-1" {...form.register("heroStatement")} />
+          {form.formState.errors.heroStatement && <p className="mt-1 text-xs text-red-700">{form.formState.errors.heroStatement.message}</p>}
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <Label htmlFor="category">Category</Label>
             <Input id="category" className="mt-1" {...form.register("category")} />
+            {form.formState.errors.category && <p className="mt-1 text-xs text-red-700">{form.formState.errors.category.message}</p>}
           </div>
           <div>
             <Label htmlFor="themePreference">Theme</Label>
@@ -77,39 +80,47 @@ export function CaseSettingsForm({
           <div>
             <Label htmlFor="jurisdiction">Jurisdiction</Label>
             <Input id="jurisdiction" className="mt-1" {...form.register("jurisdiction")} />
+            {form.formState.errors.jurisdiction && <p className="mt-1 text-xs text-red-700">{form.formState.errors.jurisdiction.message}</p>}
           </div>
           <div>
             <Label htmlFor="courtOrForum">Court or forum</Label>
             <Input id="courtOrForum" className="mt-1" {...form.register("courtOrForum")} />
+            {form.formState.errors.courtOrForum && <p className="mt-1 text-xs text-red-700">{form.formState.errors.courtOrForum.message}</p>}
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <Label htmlFor="matterNumber">Matter number</Label>
             <Input id="matterNumber" className="mt-1" {...form.register("matterNumber")} />
+            {form.formState.errors.matterNumber && <p className="mt-1 text-xs text-red-700">{form.formState.errors.matterNumber.message}</p>}
           </div>
           <div>
             <Label htmlFor="statusLabel">Status label</Label>
             <Input id="statusLabel" className="mt-1" {...form.register("statusLabel")} />
+            {form.formState.errors.statusLabel && <p className="mt-1 text-xs text-red-700">{form.formState.errors.statusLabel.message}</p>}
           </div>
         </div>
         <div>
           <Label htmlFor="logoUrl">Logo URL</Label>
           <Input id="logoUrl" className="mt-1" {...form.register("logoUrl")} />
+          {form.formState.errors.logoUrl && <p className="mt-1 text-xs text-red-700">{form.formState.errors.logoUrl.message}</p>}
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <Label htmlFor="plaintiffLabel">Plaintiff label</Label>
             <Input id="plaintiffLabel" className="mt-1" {...form.register("plaintiffLabel")} />
+            {form.formState.errors.plaintiffLabel && <p className="mt-1 text-xs text-red-700">{form.formState.errors.plaintiffLabel.message}</p>}
           </div>
           <div>
             <Label htmlFor="defendantLabel">Defendant label</Label>
             <Input id="defendantLabel" className="mt-1" {...form.register("defendantLabel")} />
+            {form.formState.errors.defendantLabel && <p className="mt-1 text-xs text-red-700">{form.formState.errors.defendantLabel.message}</p>}
           </div>
         </div>
         <div>
           <Label htmlFor="counselNotes">Counsel notes</Label>
           <Textarea id="counselNotes" rows={4} className="mt-1" {...form.register("counselNotes")} />
+          {form.formState.errors.counselNotes && <p className="mt-1 text-xs text-red-700">{form.formState.errors.counselNotes.message}</p>}
         </div>
       </section>
 
@@ -168,10 +179,12 @@ export function CaseSettingsForm({
               <div className="min-w-[200px] flex-1">
                 <Label>Name</Label>
                 <Input className="mt-1" {...form.register(`parties.${index}.name`)} />
+                {form.formState.errors.parties?.[index]?.name && <p className="mt-1 text-xs text-red-700">{form.formState.errors.parties[index]?.name?.message}</p>}
               </div>
               <div>
                 <Label>Order</Label>
                 <Input type="number" className="mt-1 w-20" {...form.register(`parties.${index}.sortOrder`, { valueAsNumber: true })} />
+                {form.formState.errors.parties?.[index]?.sortOrder && <p className="mt-1 text-xs text-red-700">{form.formState.errors.parties[index]?.sortOrder?.message}</p>}
               </div>
               <Button type="button" variant="ghost" size="sm" className="text-red-700" onClick={() => remove(index)} disabled={fields.length <= 1}>
                 Remove
@@ -180,6 +193,7 @@ export function CaseSettingsForm({
             <div>
               <Label>Description</Label>
               <Textarea rows={3} className="mt-1" {...form.register(`parties.${index}.description`)} />
+              {form.formState.errors.parties?.[index]?.description && <p className="mt-1 text-xs text-red-700">{form.formState.errors.parties[index]?.description?.message}</p>}
             </div>
           </div>
         ))}

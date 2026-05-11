@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { TenantAdminMobileNav } from "@/components/admin/tenant-admin-mobile-nav";
 
 const links = [
   ["", "Dashboard"],
@@ -27,7 +28,7 @@ export default async function TenantAdminDashboardLayout({
   if (!tenant) notFound();
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-black dark:bg-neutral-950 dark:text-white">
+    <div className="admin-shell min-h-screen bg-neutral-50 text-black dark:bg-neutral-950 dark:text-white">
       <div className="flex min-h-screen">
         <aside className="hidden w-56 shrink-0 border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black md:block">
           <div className="p-4 text-sm font-bold">Admin · {params.tenantSlug}</div>
@@ -43,7 +44,10 @@ export default async function TenantAdminDashboardLayout({
             ))}
           </nav>
         </aside>
-        <div className="flex-1 overflow-auto">{children}</div>
+        <div className="flex-1 overflow-auto">
+          <TenantAdminMobileNav tenantSlug={params.tenantSlug} />
+          {children}
+        </div>
       </div>
     </div>
   );

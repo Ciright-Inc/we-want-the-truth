@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlatformDisclaimer } from "@/components/legal-disclaimer";
+import { normalizeEmail, validateRegisterInput } from "@/lib/validators/client-auth";
 
 export default function TenantRegisterPage({ params }: { params: { tenantSlug: string } }) {
   const router = useRouter();
@@ -19,8 +20,9 @@ export default function TenantRegisterPage({ params }: { params: { tenantSlug: s
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!accept) {
-      setError("You must accept the terms.");
+    const validationError = validateRegisterInput({ name, email, password, accept });
+    if (validationError) {
+      setError(validationError);
       return;
     }
     setLoading(true);
@@ -30,8 +32,8 @@ export default function TenantRegisterPage({ params }: { params: { tenantSlug: s
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          email,
+          name: name.trim() || undefined,
+          email: normalizeEmail(email),
           password,
           tenantSlug: params.tenantSlug,
           acceptTerms: true as const,
@@ -64,6 +66,7 @@ export default function TenantRegisterPage({ params }: { params: { tenantSlug: s
         <div>
           <Label htmlFor="password">Password (min 10 characters)</Label>
           <Input id="password" type="password" required minLength={10} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" />
+          <p className="mt-1 text-xs text-neutral-500">Use uppercase, lowercase, number, and special character.</p>
         </div>
         <label className="flex items-start gap-2 text-sm">
           <input type="checkbox" checked={accept} onChange={(e) => setAccept(e.target.checked)} className="mt-1" />

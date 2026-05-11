@@ -10,17 +10,25 @@ import { Label } from "@/components/ui/label";
 function Form({ tenantSlug }: { tenantSlug: string }) {
   const sp = useSearchParams();
   const callbackUrl = sp.get("callbackUrl") || `/t/${tenantSlug}/admin`;
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!username.trim()) {
+      setError("Username is required.");
+      return;
+    }
+    if (!password) {
+      setError("Password is required.");
+      return;
+    }
     setLoading(true);
     setError(null);
     const res = await signIn("credentials", {
-      email,
+      email: username.trim(),
       password,
       tenantSlug,
       redirect: false,
@@ -39,8 +47,8 @@ function Form({ tenantSlug }: { tenantSlug: string }) {
       <p className="mt-2 text-sm text-neutral-600">{tenantSlug}</p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <div>
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" />
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" required value={username} onChange={(e) => setUsername(e.target.value)} className="mt-1" />
         </div>
         <div>
           <Label htmlFor="password">Password</Label>

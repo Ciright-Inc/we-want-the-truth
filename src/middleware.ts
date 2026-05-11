@@ -40,7 +40,11 @@ export async function middleware(request: NextRequest) {
 
   if (path.startsWith("/super-admin")) {
     const secret = process.env.NEXTAUTH_SECRET;
-    if (!secret) return NextResponse.next();
+    if (!secret) {
+      url.pathname = "/super-admin/login";
+      url.searchParams.set("callbackUrl", path);
+      return NextResponse.redirect(url);
+    }
     const token = await getToken({ req: request, secret });
     if (!token || token.role !== "SUPER_ADMIN") {
       url.pathname = "/super-admin/login";
@@ -57,7 +61,11 @@ export async function middleware(request: NextRequest) {
     if (isLogin) return NextResponse.next();
 
     const secret = process.env.NEXTAUTH_SECRET;
-    if (!secret) return NextResponse.next();
+    if (!secret) {
+      url.pathname = `/t/${slug}/admin/login`;
+      url.searchParams.set("callbackUrl", path);
+      return NextResponse.redirect(url);
+    }
     const token = await getToken({ req: request, secret });
     if (!token) {
       url.pathname = `/t/${slug}/admin/login`;
