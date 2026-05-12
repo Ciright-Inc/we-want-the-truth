@@ -3,10 +3,14 @@ import { SuperAdminMobileNav } from "@/components/admin/super-admin-mobile-nav";
 import { SuperAdminSidebarNav } from "@/components/admin/super-admin-sidebar-nav";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { Shield } from "lucide-react";
 
 export default async function SuperAdminConsoleLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+    redirect("/super-admin/login?callbackUrl=/super-admin");
+  }
 
   return (
     <div className="admin-shell h-screen overflow-hidden bg-neutral-100 text-black">

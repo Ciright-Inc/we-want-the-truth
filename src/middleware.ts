@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
   if (path === "/admin" || path.startsWith("/admin/")) {
     const suffix = path.slice("/admin".length);
     url.pathname = `/super-admin${suffix}`;
-    return NextResponse.rewrite(url);
+    return NextResponse.redirect(url);
   }
 
   // Production super-admin hostname → internal /super-admin routes
