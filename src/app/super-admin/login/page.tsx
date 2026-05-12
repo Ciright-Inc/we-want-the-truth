@@ -1,8 +1,9 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { ArrowRight, KeyRound, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,12 +11,24 @@ import { Label } from "@/components/ui/label";
 
 function Form() {
   const sp = useSearchParams();
-  const callbackUrl = sp.get("callbackUrl") || "/super-admin";
+  const { data: session, status } = useSession();
+  const callbackUrl = useMemo(() => {
+    const raw = sp.get("callbackUrl");
+    if (!raw || !raw.startsWith("/")) return "/super-admin";
+    return raw;
+  }, [sp]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.user) return;
+    if (session.user.role === "SUPER_ADMIN") {
+      window.location.href = callbackUrl;
+    }
+  }, [callbackUrl, session, status]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -99,7 +112,7 @@ function Form() {
             {fieldErrors.password ? <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p> : null}
           </div>
           {error && <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>}
-          <Button type="submit" size="lg" className="w-full" disabled={loading}>
+          <Button type="submit" size="lg" className="w-full" disabled={loading || status === "loading"}>
             {loading ? "Signing in..." : "Sign in to Console"}
             {!loading ? <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden /> : null}
           </Button>

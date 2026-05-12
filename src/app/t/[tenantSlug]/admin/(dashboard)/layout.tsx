@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { TenantAdminMobileNav } from "@/components/admin/tenant-admin-mobile-nav";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { LogoutButton } from "@/components/admin/logout-button";
 
 const links = [
   ["", "Dashboard"],
@@ -24,6 +27,20 @@ export default async function TenantAdminDashboardLayout({
   children: React.ReactNode;
   params: { tenantSlug: string };
 }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    redirect(`/t/${params.tenantSlug}/admin/login?callbackUrl=${encodeURIComponent(`/t/${params.tenantSlug}/admin`)}`);
+  }
+
+  const role = session.user.role;
+  const isAllowedRole = role === "SUPER_ADMIN" || role === "TENANT_ADMIN" || role === "TENANT_EDITOR";
+  if (!isAllowedRole) {
+    redirect(`/t/${params.tenantSlug}/admin/login`);
+  }
+  if (role !== "SUPER_ADMIN" && session.user.tenantSlug !== params.tenantSlug) {
+    redirect(`/t/${params.tenantSlug}/admin/login`);
+  }
+
   const tenant = await prisma.tenant.findUnique({ where: { slug: params.tenantSlug } });
   if (!tenant) notFound();
 
@@ -43,9 +60,22 @@ export default async function TenantAdminDashboardLayout({
               </Link>
             ))}
           </nav>
+          <div className="mt-auto border-t border-neutral-200 bg-neutral-50/70 px-3 py-3 dark:border-neutral-800 dark:bg-neutral-950">
+            <LogoutButton
+              callbackUrl={`/t/${params.tenantSlug}/admin/login`}
+              userName={session.user.name ?? null}
+              userEmail={session.user.email ?? null}
+              userImage={session.user.image ?? null}
+            />
+          </div>
         </aside>
         <div className="flex-1 overflow-auto">
-          <TenantAdminMobileNav tenantSlug={params.tenantSlug} />
+          <TenantAdminMobileNav
+            tenantSlug={params.tenantSlug}
+            userName={session.user.name ?? null}
+            userEmail={session.user.email ?? null}
+            userImage={session.user.image ?? null}
+          />
           {children}
         </div>
       </div>

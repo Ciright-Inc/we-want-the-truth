@@ -1,6 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +20,7 @@ function getInitials(value: string) {
 }
 
 export function LogoutButton({ callbackUrl = "/super-admin/login", userName, userEmail, userImage }: LogoutButtonProps) {
+  const router = useRouter();
   const displayName = userName?.trim() || "Signed in user";
   const subtitle = userEmail?.trim() || "Super admin";
 
@@ -43,7 +45,11 @@ export function LogoutButton({ callbackUrl = "/super-admin/login", userName, use
         type="button"
         variant="outline"
         className="h-12 w-full justify-start rounded-xl border-neutral-300 bg-white text-base font-semibold text-neutral-800 shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-neutral-100"
-        onClick={() => signOut({ callbackUrl })}
+        onClick={async () => {
+          await signOut({ redirect: false });
+          router.replace(callbackUrl.startsWith("/") ? callbackUrl : "/super-admin/login");
+          router.refresh();
+        }}
       >
         <LogOut className="mr-2 h-4 w-4" aria-hidden />
         Logout
